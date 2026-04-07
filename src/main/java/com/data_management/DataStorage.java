@@ -14,13 +14,15 @@ import com.alerts.AlertGenerator;
  */
 public class DataStorage {
     private Map<Integer, Patient> patientMap; // Stores patient objects indexed by their unique patient ID.
+    private DataReader dataReader;
 
     /**
      * Constructs a new instance of DataStorage, initializing the underlying storage
      * structure.
      */
-    public DataStorage() {
+    public DataStorage(DataReader dataReader) {
         this.patientMap = new HashMap<>();
+        this.dataReader = dataReader;
     }
 
     /**
@@ -83,9 +85,8 @@ public class DataStorage {
      * @param args command line arguments
      */
     public static void main(String[] args) {
-        // DataReader is not defined in this scope, should be initialized appropriately.
-        // DataReader reader = new SomeDataReaderImplementation("path/to/data");
-        DataStorage storage = new DataStorage();
+        DataReader reader = new MockReader("path/to/data");
+        DataStorage storage = new DataStorage(reader);
 
         // Assuming the reader has been properly initialized and can read data into the
         // storage
