@@ -9,7 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 // Change: added Javadoc comment
 /**
- * Implementation of OutputStrategy.
+ * Implementation of the {@link OutputStrategy} that outputs health data into physical text files.
+ * This class creates a directory structure if it does not exist and organizes data by its label.
  */
 public class FileOutputStrategy implements OutputStrategy {
 
@@ -23,26 +24,27 @@ public class FileOutputStrategy implements OutputStrategy {
 
     // Change: added Javadoc comment
     /**
-     * Constructor for FileOutputStrategy.
+     * Constructs a FileOutputStrategy with a specified target directory.
      *
-     * @param baseDirectory The base directory where output files will be stored.
+     * @param baseDirectory String. The root directory where output files will be stored.
      */
     public FileOutputStrategy(String baseDirectory) {
         this.baseDirectory = baseDirectory;
     }
 
-    // Changed variable name from timestamp, variables use lowerCamelCase
     // Change: added Javadoc comment
     /**
-     * Outputs the patient data to a file specified by the label.
+     * Outputs the patient data to a file specified by the label in the root directory.
+     * The data is appended to the file in the format:
+     * "Patient ID: [patientId], Timestamp: [timeStamp], Label: [label], Data: [data]".
      *
-     * @param patientId The ID of the patient.
-     * @param timeStamp The time the data was recorded.
-     * @param label The type of data being recorded.
-     * @param data The data to be stored.
+     * @param patientId int. The ID of the patient.
+     * @param timestamp long. The time the data was recorded.
+     * @param label String. The type of data being recorded. Specifies the filename.
+     * @param data String. The data to be stored.
      */
     @Override
-    public void output(int patientId, long timeStamp, String label, String data) {
+    public void output(int patientId, long timestamp, String label, String data) {
         try {
             // Create the directory
             Files.createDirectories(Paths.get(baseDirectory));
@@ -63,7 +65,7 @@ public class FileOutputStrategy implements OutputStrategy {
                         StandardOpenOption.CREATE, StandardOpenOption.APPEND))) {
             // Change: seperated the code into two lines for better readability
             out.printf("Patient ID: %d, Timestamp: %d, Label: %s, Data: %s%n",
-                    patientId, timeStamp, label, data);
+                    patientId, timestamp, label, data);
         } catch (IOException e) { // Changed from generic Exception
             System.err.println("Error writing to file " + filePath + ": " + e.getMessage());
         }
