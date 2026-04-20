@@ -4,6 +4,7 @@ import java.util.Random;
 import com.cardio_generator.outputs.OutputStrategy;
 
 /**
+ * Implementation of the {@link PatientDataGenerator}.
  * Generates simulated blood saturation values for a given patient.
  * This class maintains the state of the last recorded saturation for each patient.
  */

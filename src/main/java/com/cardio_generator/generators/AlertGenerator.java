@@ -4,32 +4,53 @@ import java.util.Random;
 
 import com.cardio_generator.outputs.OutputStrategy;
 
+/**
+ * Implementation of the {@link PatientDataGenerator}.
+ * Tracks the alert state (triggered or resolved) for give number of patients.
+ */
+
 public class AlertGenerator implements PatientDataGenerator {
 
-    public static final Random randomGenerator = new Random();
-    private boolean[] AlertStates; // false = resolved, true = pressed
+    // Changed name variable from randomGenerator
+    // Changed from public
+    private static final Random RANDOM_GENERATOR = new Random();
+    // Changed variable name form AlertStates
+    private boolean[] alertStates; // false = resolved, true = pressed
 
+    /**
+     * Constructs an AlertGenerator for a specific number of patients.
+     *
+     * @param patientCount int. The number of patients to generate data for.
+     */
     public AlertGenerator(int patientCount) {
-        AlertStates = new boolean[patientCount + 1];
+        alertStates = new boolean[patientCount + 1];
     }
 
+    /**
+     * Triggers or resolves an alert for given patient.
+     * * <p>If a patient currently has an active alert, there is a 90% chance it will resolve.
+     * If no alert is active, a new one is triggered based on a probability derived from
+     * the rate λ (lambda).</p>
+     *
+     * @param patientId int. The ID of the patient.
+     * @param outputStrategy OutputStrategy. The OutputStrategy to be used to store or output the generate data.
+     */
     @Override
     public void generate(int patientId, OutputStrategy outputStrategy) {
         try {
-            if (AlertStates[patientId]) {
-                if (randomGenerator.nextDouble() < 0.9) { // 90% chance to resolve
-                    AlertStates[patientId] = false;
-                    // Output the alert
+            if (alertStates[patientId]) {
+                if (RANDOM_GENERATOR.nextDouble() < 0.9) { // 90% chance to resolve
+                    alertStates[patientId] = false;
                     outputStrategy.output(patientId, System.currentTimeMillis(), "Alert", "resolved");
                 }
             } else {
-                double Lambda = 0.1; // Average rate (alerts per period), adjust based on desired frequency
-                double p = -Math.expm1(-Lambda); // Probability of at least one alert in the period
-                boolean alertTriggered = randomGenerator.nextDouble() < p;
+                // Changed variable name form Lambda
+                double lambda = 0.1; // Average rate (alerts per period), adjust based on desired frequency
+                double p = -Math.expm1(-lambda); // Probability of at least one alert in the period
+                boolean alertTriggered = RANDOM_GENERATOR.nextDouble() < p;
 
                 if (alertTriggered) {
-                    AlertStates[patientId] = true;
-                    // Output the alert
+                    alertStates[patientId] = true;
                     outputStrategy.output(patientId, System.currentTimeMillis(), "Alert", "triggered");
                 }
             }
