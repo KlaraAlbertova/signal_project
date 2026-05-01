@@ -102,6 +102,7 @@ public class DataStorage {
         }
 
         // Initialize the AlertGenerator with the storage
+        // TODO add staffMembers not null
         AlertGenerator alertGenerator = new AlertGenerator(storage);
 
         // Evaluate all patients' data to check for conditions that may trigger alerts
