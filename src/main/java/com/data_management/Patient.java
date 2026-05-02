@@ -5,19 +5,18 @@ import java.util.List;
 
 /**
  * Represents a patient and manages their medical records.
- * This class stores patient-specific data, allowing for the addition and
- * retrieval
- * of medical records based on specified criteria.
+ *
+ * <p>Stores patient-specific data and provides methods for adding records
+ * and retrieving them in full or filtered by a time range.</p>
  */
 public class Patient {
     private int patientId;
     private List<PatientRecord> patientRecords;
 
     /**
-     * Constructs a new Patient with a specified ID.
-     * Initializes an empty list of patient records.
+     * Constructs a new {@code Patient} with the specified ID and an empty record list.
      *
-     * @param patientId the unique identifier for the patient
+     * @param patientId the unique identifier for this patient
      */
     public Patient(int patientId) {
         this.patientId = patientId;
@@ -26,8 +25,6 @@ public class Patient {
 
     /**
      * Adds a new record to this patient's list of medical records.
-     * The record is created with the specified measurement value, record type, and
-     * timestamp.
      *
      * @param measurementValue the measurement value to store in the record
      * @param recordType       the type of record, e.g., "HeartRate",
@@ -61,6 +58,12 @@ public class Patient {
         return subRecords;
     }
 
+    /**
+     * Returns the complete list of all records associated with this patient,
+     * regardless of timestamp.
+     *
+     * @return a list of all {@link PatientRecord} objects for this patient
+     */
     public List<PatientRecord> getAllRecords() {
         return patientRecords;
     }
