@@ -9,8 +9,8 @@ public interface PatientDataGenerator {
     /**
      * Triggers the generation of data for the given patient.
      *
-     * @param patientId int. The ID of the patient.
-     * @param outputStrategy OutputStrategy. The OutputStrategy to be used to store or output the generate data.
+     * @param patientId      the ID of the patient
+     * @param outputStrategy the strategy used to output or store the generated data
      */
     void generate(int patientId, OutputStrategy outputStrategy);
 }

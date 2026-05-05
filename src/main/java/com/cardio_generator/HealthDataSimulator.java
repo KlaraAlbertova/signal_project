@@ -26,24 +26,25 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 /**
- * This class is responsible for parsing command-line arguments,and scheduling
- * periodic health data generation tasks for a specified number of patients.
+ * Entry point and coordinator for the health data simulation.
+ * Parses command-line arguments, configures the output strategy,
+ * and schedules periodic health data generation tasks for a specified
+ * number of simulated patients.
  */
 public class HealthDataSimulator {
 
     private static int patientCount = 50; // Default number of patients
     private static ScheduledExecutorService scheduler;
-    private static OutputStrategy outputStrategy = new ConsoleOutputStrategy();
-    // Default output strategy
+    private static OutputStrategy outputStrategy = new ConsoleOutputStrategy(); // Default output strategy
     private static final Random random = new Random();
 
     /**
      * Main entry point for the simulation.
-     * Initializes the scheduler and list of patient IDs.
-     * Starts the generation tasks.
+     * Parses command-line arguments, initializes the thread pool scheduler,
+     * generates a shuffled list of patient IDs, and starts all data generation tasks.
      *
-     * @param args Command-line arguments used to configure patient count and output strategy.
-     * @throws IOException If there is an error setting up file-based output directories.
+     * @param args command-line arguments used to configure patient count and output strategy
+     * @throws IOException if there is an error setting up file-based output directories
      */
     public static void main(String[] args) throws IOException {
 
@@ -59,9 +60,11 @@ public class HealthDataSimulator {
 
     /**
      * Parses command-line arguments to configure the simulation.
+     * Supports setting the patient count and selecting an output strategy
+     * (console, file, WebSocket, or TCP).
      *
-     * @param args The array of command-line arguments
-     * @throws IOException If directory creation fails for the 'file' output strategy.
+     * @param args the array of command-line arguments
+     * @throws IOException if directory creation fails for the {@code file} output strategy
      */
     private static void parseArguments(String[] args) throws IOException {
         for (int i = 0; i < args.length; i++) {
@@ -125,7 +128,7 @@ public class HealthDataSimulator {
     }
 
     /**
-     * Prints the help menu to the console.
+     * Prints usage instructions and available options to the console.
      */
     private static void printHelp() {
         System.out.println("Usage: java HealthDataSimulator [options]");
@@ -145,10 +148,10 @@ public class HealthDataSimulator {
     }
 
     /**
-     * Creates a list of new sequential patient IDs.
+     * Creates and returns a sequential list of patient IDs from 1 to {@code patientCount}.
      *
-     * @param patientCount int. The number of patients to initialize IDs for.
-     * @return the list of the newly generated patient IDs.
+     * @param patientCount the number of patients to initialize IDs for
+     * @return a list of sequential patient IDs
      */
     private static List<Integer> initializePatientIds(int patientCount) {
         List<Integer> patientIds = new ArrayList<>();
@@ -159,9 +162,10 @@ public class HealthDataSimulator {
     }
 
     /**
-     * Helper method for initializes data generators and scheduling tasks for each given patient.
+     * Initializes all data generators and schedules recurring data generation
+     * tasks for each patient in the provided list.
      *
-     * @param patientIds The list of patient IDs for whom data should be generated.
+     * @param patientIds the list of patient IDs for whom data should be generated
      */
     private static void scheduleTasksForPatients(List<Integer> patientIds) {
         ECGDataGenerator ecgDataGenerator = new ECGDataGenerator(patientCount);
@@ -180,11 +184,11 @@ public class HealthDataSimulator {
     }
 
     /**
-     * Helper method to schedule a task.
+     * Schedules a recurring task on the shared scheduler with a random initial delay.
      *
-     * @param task Runnable. The task to be scheduled.
-     * @param period long. The time between successive executions.
-     * @param timeUnit TimeUnit. The time unit of the period and initial delay.
+     * @param task     the task to be executed periodically
+     * @param period   the time between successive executions
+     * @param timeUnit the time unit of the period and initial delay
      */
     private static void scheduleTask(Runnable task, long period, TimeUnit timeUnit) {
         scheduler.scheduleAtFixedRate(task, random.nextInt(5), period, timeUnit);

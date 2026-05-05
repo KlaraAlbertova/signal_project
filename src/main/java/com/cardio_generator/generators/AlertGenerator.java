@@ -5,35 +5,34 @@ import java.util.Random;
 import com.cardio_generator.outputs.OutputStrategy;
 
 /**
- * Implementation of the {@link PatientDataGenerator}.
- * Tracks the alert state (triggered or resolved) for give number of patients.
+ * Implementation of {@link PatientDataGenerator} that simulates patient alert events.
+ * Tracks the alert state (triggered or resolved) for a given number of patients.
  */
-
 public class AlertGenerator implements PatientDataGenerator {
 
     // Changed name variable from randomGenerator
-    // Changed from public
-    private static final Random RANDOM_GENERATOR = new Random();
+    public static final Random RANDOM_GENERATOR = new Random();
     // Changed variable name form AlertStates
-    private boolean[] alertStates; // false = resolved, true = pressed
+    private boolean[] alertStates; // false = resolved, true = triggered
 
     /**
-     * Constructs an AlertGenerator for a specific number of patients.
+     * Constructs an {@code AlertGenerator} for the specified number of patients.
      *
-     * @param patientCount int. The number of patients to generate data for.
+     * @param patientCount the number of patients to generate alert data for
      */
     public AlertGenerator(int patientCount) {
         alertStates = new boolean[patientCount + 1];
     }
 
     /**
-     * Triggers or resolves an alert for given patient.
-     * * <p>If a patient currently has an active alert, there is a 90% chance it will resolve.
-     * If no alert is active, a new one is triggered based on a probability derived from
-     * the rate λ (lambda).</p>
+     * Triggers or resolves an alert for the given patient and outputs the result.
      *
-     * @param patientId int. The ID of the patient.
-     * @param outputStrategy OutputStrategy. The OutputStrategy to be used to store or output the generate data.
+     * <p>If the patient currently has an active alert, there is a 90% chance it will
+     * be resolved. If no alert is active, a new one may be triggered based on a
+     * Poisson-derived probability using rate λ (lambda = 0.1).</p>
+     *
+     * @param patientId      the ID of the patient
+     * @param outputStrategy the strategy used to output or store the generated data
      */
     @Override
     public void generate(int patientId, OutputStrategy outputStrategy) {

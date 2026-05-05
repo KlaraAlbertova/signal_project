@@ -9,8 +9,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 // Change: added Javadoc comment
 /**
- * Implementation of the {@link OutputStrategy} that outputs health data into physical text files.
- * This class creates a directory structure if it does not exist and organizes data by its label.
+ * Implementation of {@link OutputStrategy} that writes health data to text files.
+ * Creates the target directory structure if it does not exist and organizes
+ * output into separate files per data label.
  */
 public class FileOutputStrategy implements OutputStrategy {
 
@@ -24,9 +25,9 @@ public class FileOutputStrategy implements OutputStrategy {
 
     // Change: added Javadoc comment
     /**
-     * Constructs a FileOutputStrategy with a specified target directory.
+     * Constructs a {@code FileOutputStrategy} with the specified target directory.
      *
-     * @param baseDirectory String. The root directory where output files will be stored.
+     * @param baseDirectory the root directory where output files will be stored
      */
     public FileOutputStrategy(String baseDirectory) {
         this.baseDirectory = baseDirectory;
@@ -34,14 +35,14 @@ public class FileOutputStrategy implements OutputStrategy {
 
     // Change: added Javadoc comment
     /**
-     * Outputs the patient data to a file specified by the label in the root directory.
-     * The data is appended to the file in the format:
-     * "Patient ID: [patientId], Timestamp: [timeStamp], Label: [label], Data: [data]".
+     * Writes patient data to a label-specific text file within the base directory.
+     * The file is created if it does not exist, and data is appended in the format:
+     * {@code Patient ID: [patientId], Timestamp: [timestamp], Label: [label], Data: [data]}.
      *
-     * @param patientId int. The ID of the patient.
-     * @param timestamp long. The time the data was recorded.
-     * @param label String. The type of data being recorded. Specifies the filename.
-     * @param data String. The data to be stored.
+     * @param patientId the ID of the patient
+     * @param timestamp the time the data was recorded, in milliseconds since epoch
+     * @param label     the type of data being recorded; also used as the output filename
+     * @param data      the data value to be written
      */
     @Override
     public void output(int patientId, long timestamp, String label, String data) {
