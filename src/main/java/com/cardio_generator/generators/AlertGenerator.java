@@ -24,6 +24,7 @@ public class AlertGenerator implements PatientDataGenerator {
         alertStates = new boolean[patientCount + 1];
     }
 
+
     /**
      * Triggers or resolves an alert for the given patient and outputs the result.
      *
