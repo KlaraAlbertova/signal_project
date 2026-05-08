@@ -2,8 +2,7 @@ package data_management;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.alerts.Alert;
-import com.data_management.PatientRecord;
+import com.alerts.alerts.Alert;
 import com.data_management.Staff;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

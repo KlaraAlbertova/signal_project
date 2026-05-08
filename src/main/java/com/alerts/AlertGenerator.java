@@ -1,5 +1,6 @@
 package com.alerts;
 
+import com.alerts.alerts.Alert;
 import com.data_management.DataStorage;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
@@ -187,7 +188,7 @@ public class AlertGenerator {
         for (int i =0; i<records.size(); i++) {
             if(records.get(i).getMeasurementValue() < 92 ) {
                 Alert alert = new Alert(String.valueOf(records.get(i).getPatientId()),
-                        "Blood saturation bellow 92%" , records.get(i).getTimestamp());
+                        "Blood oxygen saturation bellow 92%" , records.get(i).getTimestamp());
                 Staff mockstaff = new Staff(0);
                 triggerAlert(alert, List.of(mockstaff));
             }
@@ -197,7 +198,7 @@ public class AlertGenerator {
                 if (timeDiff > 600_000) break;
                 if (records.get(j).getMeasurementValue() - records.get(i).getMeasurementValue() >= 5) {
                     Alert alert = new Alert(String.valueOf(records.get(i).getPatientId()),
-                            "Rapid drop of blood saturation" , records.get(i).getTimestamp());
+                            "Rapid drop of blood oxygen saturation" , records.get(i).getTimestamp());
                     Staff mockstaff = new Staff(0);
                     triggerAlert(alert, List.of(mockstaff));
                     break;

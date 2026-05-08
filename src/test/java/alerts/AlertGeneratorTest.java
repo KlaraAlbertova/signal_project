@@ -2,7 +2,7 @@ package alerts;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.alerts.Alert;
+import com.alerts.alerts.Alert;
 import com.alerts.AlertGenerator;
 import com.alerts.AlertManager;
 import com.data_management.DataReader;

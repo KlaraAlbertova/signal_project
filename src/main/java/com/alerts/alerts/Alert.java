@@ -1,4 +1,4 @@
-package com.alerts;
+package com.alerts.alerts;
 
 // Represents an alert
 public class Alert {

@@ -1,6 +1,6 @@
 package com.data_management;
 
-import com.alerts.Alert;
+import com.alerts.alerts.Alert;
 
 import java.util.ArrayList;
 import java.util.List;
