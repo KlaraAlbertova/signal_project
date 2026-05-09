@@ -22,8 +22,9 @@ class AlertGeneratorTest {
 
     @BeforeEach
     void setUp() {
+        DataStorage.resetInstance();
         DataReader reader = new MockReader("path/to/data");
-        storage = new DataStorage(reader);
+        storage = DataStorage.getInstance(reader);
         alertGenerator = new AlertGenerator(storage);
         alertManager = alertGenerator.getAlertManager();
     }
@@ -148,7 +149,7 @@ class AlertGeneratorTest {
 
         List<Alert> alerts = alertManager.getDispatchedAlerts();
         assertEquals(1, alerts.size());
-        assertEquals("Blood saturation bellow 92%", alerts.get(0).getCondition());
+        assertEquals("Blood oxygen saturation bellow 92%", alerts.get(0).getCondition());
     }
 
     @Test
@@ -168,7 +169,7 @@ class AlertGeneratorTest {
         alertGenerator.evaluateData(patient);
 
         List<Alert> alerts = alertManager.getDispatchedAlerts();
-        assertTrue(alerts.stream().anyMatch(a -> a.getCondition().equals("Rapid drop of blood saturation")));
+        assertTrue(alerts.stream().anyMatch(a -> a.getCondition().equals("Rapid drop of blood oxygen saturation")));
     }
 
     @Test
@@ -276,7 +277,7 @@ class AlertGeneratorTest {
     @Test
     void testEvaluateDataWithNoRecords() {
         DataReader reader2 = new MockReader("path/to/data");
-        DataStorage emptyStorage = new DataStorage(reader2);
+        DataStorage emptyStorage = DataStorage.getInstance(reader2);
         emptyStorage.addPatientData(2, 120.0, "SystolicPressure", 1000L);
         Patient patient = emptyStorage.getAllPatients().get(0);
         alertGenerator.evaluateData(patient);

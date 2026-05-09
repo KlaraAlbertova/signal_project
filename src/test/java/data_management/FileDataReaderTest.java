@@ -6,6 +6,7 @@ import com.data_management.DataStorage;
 import com.data_management.FileDataReader;
 import com.data_management.MockReader;
 import com.data_management.PatientRecord;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -19,13 +20,18 @@ class FileDataReaderTest {
     @TempDir
     Path tempDir; // JUnit creates a temporary folder
 
+    @BeforeEach
+    void setUp() {
+        DataStorage.resetInstance();
+    }
+
     @Test
     void testReadValidCSVFile() throws IOException {
         Path csvFile = tempDir.resolve("test.csv");
         Files.writeString(csvFile, "1,100.0,SystolicPressure,1000\n");
 
         FileDataReader reader = new FileDataReader(tempDir.toString());
-        DataStorage storage = new DataStorage(new MockReader(""));
+        DataStorage storage = DataStorage.getInstance(new MockReader(""));
         reader.readData(storage);
 
         List<PatientRecord> records = storage.getRecords(1, 0L, 9999L);
@@ -40,7 +46,7 @@ class FileDataReaderTest {
         Files.writeString(csvFile, "1,100.0,SystolicPressure,1000\n1,80.0,DiastolicPressure,2000\n");
 
         FileDataReader reader = new FileDataReader(tempDir.toString());
-        DataStorage storage = new DataStorage(new MockReader(""));
+        DataStorage storage = DataStorage.getInstance(new MockReader(""));
         reader.readData(storage);
 
         List<PatientRecord> records = storage.getRecords(1, 0L, 9999L);
@@ -50,7 +56,7 @@ class FileDataReaderTest {
     @Test
     void testInvalidDirectoryThrowsIOException() {
         FileDataReader reader = new FileDataReader("nonexistent/path");
-        DataStorage storage = new DataStorage(new MockReader(""));
+        DataStorage storage = DataStorage.getInstance(new MockReader(""));
 
         assertThrows(IOException.class, () -> reader.readData(storage));
     }
@@ -62,7 +68,7 @@ class FileDataReaderTest {
         Files.writeString(csvFile, "this is not valid csv\n1,100.0,SystolicPressure,1000\n");
 
         FileDataReader reader = new FileDataReader(tempDir.toString());
-        DataStorage storage = new DataStorage(new MockReader(""));
+        DataStorage storage = DataStorage.getInstance(new MockReader(""));
         reader.readData(storage);
 
         List<PatientRecord> records = storage.getRecords(1, 0L, 9999L);
@@ -75,7 +81,7 @@ class FileDataReaderTest {
         Files.writeString(txtFile, "1,100.0,SystolicPressure,1000\n");
 
         FileDataReader reader = new FileDataReader(tempDir.toString());
-        DataStorage storage = new DataStorage(new MockReader(""));
+        DataStorage storage = DataStorage.getInstance(new MockReader(""));
         reader.readData(storage);
 
         List<PatientRecord> records = storage.getRecords(1, 0L, 9999L);
@@ -88,7 +94,7 @@ class FileDataReaderTest {
         Files.writeString(csvFile, "");
 
         FileDataReader reader = new FileDataReader(tempDir.toString());
-        DataStorage storage = new DataStorage(new MockReader(""));
+        DataStorage storage = DataStorage.getInstance(new MockReader(""));
         reader.readData(storage);
 
         List<PatientRecord> records = storage.getRecords(1, 0L, 9999L);

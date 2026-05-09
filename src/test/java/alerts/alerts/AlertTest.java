@@ -1,4 +1,4 @@
-package alerts;
+package alerts.alerts;
 
 import static org.junit.jupiter.api.Assertions.*;
 

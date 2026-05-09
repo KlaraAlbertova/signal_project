@@ -18,8 +18,9 @@ class DataParserTest {
 
     @BeforeEach
     void setUp() {
+        DataStorage.resetInstance();
         dataParser = new DataParser();
-        storage = new DataStorage(new MockReader(""));
+        storage = DataStorage.getInstance(new MockReader(""));
     }
 
     @Test

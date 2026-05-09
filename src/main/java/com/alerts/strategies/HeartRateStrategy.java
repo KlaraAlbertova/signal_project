@@ -10,12 +10,27 @@ import com.data_management.Staff;
 
 import java.util.List;
 
-public class HeartRateStrategy implements AlertStrategy{
+/**
+ * Strategy for monitoring ECG heart rate data.
+ *
+ * <p>Uses a sliding window of 10 samples to compute a rolling average.
+ * An alert is triggered if the current reading exceeds 150% of that average,
+ * indicating an abnormal spike in heart rate.</p>
+ */
+public class HeartRateStrategy implements AlertStrategy {
     private AlertFactory factory = new ECGAlertFactory();
 
+    /**
+     * Evaluates ECG records for the given patient and dispatches alerts
+     * for abnormal heart rate spikes.
+     *
+     * @param patient      the patient being evaluated
+     * @param records      the list of ECG records to check
+     * @param alertManager the alert manager used to dispatch alerts
+     */
     @Override
-    public void checkAlert(Patient patient, List<PatientRecord> records, AlertManager alertManager){
-        if (records==null || records.isEmpty())
+    public void checkAlert(Patient patient, List<PatientRecord> records, AlertManager alertManager) {
+        if (records == null || records.isEmpty())
             return;
 
         records.sort((a, b) -> Long.compare(a.getTimestamp(), b.getTimestamp()));
@@ -29,7 +44,7 @@ public class HeartRateStrategy implements AlertStrategy{
             avg /= windowSize;
             double current = records.get(i).getMeasurementValue();
             // Triggering an alert if current is 50% higher the average, which can be considered significant amount
-            if (current > avg*1.5) {
+            if (current > avg * 1.5) {
                 Alert alert = factory.createAlert(String.valueOf(records.get(i).getPatientId()), "ECG abnormal", records.get(i).getTimestamp());
                 alertManager.dispatchAlert(alert, List.of(new Staff(0)));
             }

@@ -27,11 +27,38 @@ public class DataStorage {
         this.dataReader = dataReader;
     }
 
+    /**
+     * Returns the singleton instance of {@code DataStorage}, creating it on the first call.
+     *
+     * @param dataReader the {@link DataReader} to use when creating the instance for the first time
+     * @return the shared {@code DataStorage} instance
+     */
     public static DataStorage getInstance(DataReader dataReader) {
         if (instance == null) {
             instance = new DataStorage(dataReader);
         }
         return instance;
+    }
+
+    /**
+     * Returns the singleton instance of {@code DataStorage}, creating it on the first call with null dataReader.
+     *
+     * @return the shared {@code DataStorage} instance
+     */
+    public static DataStorage getInstance() {
+        if (instance == null) {
+            instance = new DataStorage(null);
+        }
+        return instance;
+    }
+
+    /**
+     * Resets the singleton instance to {@code null}.
+     * <p><strong>For testing purposes only.</strong></p>
+     */
+    // For testing purposes only
+    public static void resetInstance() {
+        instance = null;
     }
 
     /**

@@ -10,18 +10,32 @@ import com.data_management.Staff;
 
 import java.util.List;
 
-public class OxygenSaturationStrategy implements AlertStrategy{
+/**
+ * Strategy for monitoring blood oxygen saturation levels.
+ *
+ * <p>Triggers an alert if saturation drops below 92%, or if there is
+ * a rapid drop of 5+ % within a 10-minute window.</p>
+ */
+public class OxygenSaturationStrategy implements AlertStrategy {
     private AlertFactory factory = new BloodOxygenAlertFactory();
 
+    /**
+     * Evaluates blood oxygen saturation records for the given patient and
+     * dispatches alerts for critical levels or rapid drops.
+     *
+     * @param patient      the patient being evaluated
+     * @param records      the list of blood oxygen saturation records to check
+     * @param alertManager the alert manager used to dispatch alerts
+     */
     @Override
     public void checkAlert(Patient patient, List<PatientRecord> records, AlertManager alertManager) {
-        if (records==null || records.isEmpty())
+        if (records == null || records.isEmpty())
             return;
 
         records.sort((a, b) -> Long.compare(a.getTimestamp(), b.getTimestamp()));
 
-        for (int i =0; i<records.size(); i++) {
-            if(records.get(i).getMeasurementValue() < 92 ) {
+        for (int i = 0; i < records.size(); i++) {
+            if (records.get(i).getMeasurementValue() < 92) {
                 Alert alert = factory.createAlert(String.valueOf(records.get(i).getPatientId()),
                         "Blood oxygen saturation bellow 92%", records.get(i).getTimestamp());
                 alertManager.dispatchAlert(alert, List.of(new Staff(0)));

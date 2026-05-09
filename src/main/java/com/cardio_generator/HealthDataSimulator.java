@@ -42,6 +42,12 @@ public class HealthDataSimulator {
 
     private HealthDataSimulator() {}
 
+
+    /**
+     * Returns the singleton instance of {@code HealthDataSimulator}, creating it on the first call.
+     *
+     * @return the shared {@code HealthDataSimulator} instance
+     */
     public static HealthDataSimulator getInstance() {
         if (instance == null) {
             instance = new HealthDataSimulator();
