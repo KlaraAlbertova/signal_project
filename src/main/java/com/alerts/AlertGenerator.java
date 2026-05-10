@@ -2,8 +2,8 @@ package com.alerts;
 
 import com.alerts.alerts.Alert;
 import com.data_management.DataStorage;
-import com.data_management.Patient;
-import com.data_management.PatientRecord;
+import com.data_management.patients.Patient;
+import com.data_management.patients.PatientRecord;
 import com.data_management.Staff;
 
 import java.util.ArrayList;

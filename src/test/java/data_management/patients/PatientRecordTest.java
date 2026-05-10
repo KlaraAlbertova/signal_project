@@ -1,8 +1,8 @@
-package data_management;
+package data_management.patients;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.data_management.PatientRecord;
+import com.data_management.patients.PatientRecord;
 import org.junit.jupiter.api.Test;
 
 class PatientRecordTest {

@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.alerts.alerts.Alert;
 import com.alerts.AlertGenerator;
 import com.alerts.AlertManager;
-import com.data_management.DataReader;
+import com.data_management.dataReaders.DataReader;
 import com.data_management.DataStorage;
-import com.data_management.MockReader;
-import com.data_management.Patient;
+import com.data_management.dataReaders.MockReader;
+import com.data_management.patients.Patient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

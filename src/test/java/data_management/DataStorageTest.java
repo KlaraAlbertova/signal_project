@@ -2,16 +2,22 @@ package data_management;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.data_management.DataReader;
-import com.data_management.MockReader;
+import com.data_management.dataReaders.DataReader;
+import com.data_management.dataReaders.MockReader;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.data_management.DataStorage;
-import com.data_management.PatientRecord;
+import com.data_management.patients.PatientRecord;
 
 import java.util.List;
 
 class DataStorageTest {
+
+    @BeforeEach
+    void setUp() {
+        DataStorage.resetInstance();
+    }
 
     @Test
     void testAddAndGetRecords() {

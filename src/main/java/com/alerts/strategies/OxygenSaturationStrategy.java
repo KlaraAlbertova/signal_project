@@ -4,8 +4,8 @@ import com.alerts.AlertManager;
 import com.alerts.alerts.Alert;
 import com.alerts.factories.AlertFactory;
 import com.alerts.factories.BloodOxygenAlertFactory;
-import com.data_management.Patient;
-import com.data_management.PatientRecord;
+import com.data_management.patients.Patient;
+import com.data_management.patients.PatientRecord;
 import com.data_management.Staff;
 
 import java.util.List;

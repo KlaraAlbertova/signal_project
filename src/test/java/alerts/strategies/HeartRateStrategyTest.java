@@ -2,8 +2,8 @@ package alerts.strategies;
 
 import com.alerts.AlertManager;
 import com.alerts.strategies.HeartRateStrategy;
-import com.data_management.Patient;
-import com.data_management.PatientRecord;
+import com.data_management.patients.Patient;
+import com.data_management.patients.PatientRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

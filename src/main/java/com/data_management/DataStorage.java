@@ -1,10 +1,14 @@
 package com.data_management;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import com.alerts.AlertGenerator;
+import com.data_management.dataReaders.DataReader;
+import com.data_management.dataReaders.MockReader;
+import com.data_management.patients.Patient;
+import com.data_management.patients.PatientRecord;
 
 /**
  * Manages storage and retrieval of patient data within a healthcare monitoring
@@ -23,7 +27,7 @@ public class DataStorage {
      * structure.
      */
     private DataStorage(DataReader dataReader) {
-        this.patientMap = new HashMap<>();
+        this.patientMap = new ConcurrentHashMap<>();
         this.dataReader = dataReader;
     }
 
@@ -64,8 +68,9 @@ public class DataStorage {
     /**
      * Adds or updates patient data in the storage.
      * If the patient does not exist, a new Patient object is created and added to
-     * the storage.
-     * Otherwise, the new data is added to the existing patient's records.
+     * the storage atomically to support concurrent real-time data updates.
+     * Otherwise, the new data is appended to the existing patient's records
+     * without duplicating information.
      *
      * @param patientId        the unique identifier of the patient
      * @param measurementValue the value of the health metric being recorded
@@ -75,12 +80,8 @@ public class DataStorage {
      *                         milliseconds since the Unix epoch
      */
     public void addPatientData(int patientId, double measurementValue, String recordType, long timestamp) {
-        Patient patient = patientMap.get(patientId);
-        if (patient == null) {
-            patient = new Patient(patientId);
-            patientMap.put(patientId, patient);
-        }
-        patient.addRecord(measurementValue, recordType, timestamp);
+        patientMap.computeIfAbsent(patientId, id -> new Patient(id));
+        patientMap.get(patientId).addRecord(measurementValue, recordType, timestamp);
     }
 
     /**
@@ -138,7 +139,6 @@ public class DataStorage {
         }
 
         // Initialize the AlertGenerator with the storage
-        // TODO add staffMembers not null
         AlertGenerator alertGenerator = new AlertGenerator(storage);
 
         // Evaluate all patients' data to check for conditions that may trigger alerts

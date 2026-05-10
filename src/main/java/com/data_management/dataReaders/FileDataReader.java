@@ -1,4 +1,7 @@
-package com.data_management;
+package com.data_management.dataReaders;
+
+import com.data_management.DataParser;
+import com.data_management.DataStorage;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,13 +16,14 @@ import java.util.stream.Stream;
  * records into a {@link DataStorage} instance.
  *
  * <p>Implements {@link DataReader} and uses a {@link DataParser} to interpret
- * each line according to its file format. Currently, supports {@code .csv} files;
- * lines from files with unrecognized extensions are passed with an empty format
- * string and will be skipped by the parser.</p>
+ * each line according to its file format. Currently, supports {@code .txt} files
+ * written by {@link com.cardio_generator.outputs.FileOutputStrategy};
+ * lines from files with unrecognized extensions are skipped by the parser.</p>
  */
 public class FileDataReader implements DataReader {
-    private String outputDirectory;
-    private DataParser dataParser = new DataParser();
+
+    private final String outputDirectory;
+    private final DataParser dataParser = new DataParser();
 
     /**
      * Constructs a {@code FileDataReader} that reads from the given directory path.
@@ -37,7 +41,7 @@ public class FileDataReader implements DataReader {
      *
      * <p>File format is inferred from the file extension:</p>
      * <ul>
-     *   <li>{@code .csv} — parsed as CSV</li>
+     *   <li>{@code .txt} — parsed as TXT</li>
      *   <li>All other extensions — format is left empty and lines will be skipped
      *       by the parser</li>
      * </ul>
@@ -61,8 +65,8 @@ public class FileDataReader implements DataReader {
                 String fileName = file.getFileName().toString().toLowerCase();
                 String format = "";
 
-                if (fileName.endsWith(".csv")) {
-                    format = "CSV";
+                if (fileName.endsWith(".txt")) {
+                    format = "TXT";
                 }
 
                 List<String> lines = Files.readAllLines(file);
@@ -72,5 +76,4 @@ public class FileDataReader implements DataReader {
             }
         }
     }
-
 }

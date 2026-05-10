@@ -1,4 +1,4 @@
-package com.data_management;
+package com.data_management.patients;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,8 +1,8 @@
 package com.alerts.strategies;
 
 import com.alerts.AlertManager;
-import com.data_management.Patient;
-import com.data_management.PatientRecord;
+import com.data_management.patients.Patient;
+import com.data_management.patients.PatientRecord;
 
 import java.util.List;
 
