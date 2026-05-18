@@ -181,4 +181,58 @@ class DataParserTest {
         dataParser.parse("1,100.0,HeartRate,1000", storage, "XML");
         assertEquals(0, storage.getRecords(1, 0L, 9999L).size());
     }
+
+    @Test
+    void testTXTSaturationWithPercentIsParsed() {
+        dataParser.parse(
+                "Patient ID: 1, Timestamp: 1000, Label: Saturation, Data: 97%",
+                storage, "TXT");
+        List<PatientRecord> records = storage.getRecords(1, 0L, 9999L);
+        assertEquals(1, records.size());
+        assertEquals(97.0, records.get(0).getMeasurementValue(), 0.001);
+    }
+
+    @Test
+    void testTXTAlertTriggeredIsParsed() {
+        dataParser.parse(
+                "Patient ID: 1, Timestamp: 1000, Label: Alert, Data: triggered",
+                storage, "TXT");
+        List<PatientRecord> records = storage.getRecords(1, 0L, 9999L);
+        assertEquals(1, records.size());
+        assertEquals(1.0, records.get(0).getMeasurementValue(), 0.001);
+    }
+
+    @Test
+    void testTXTAlertResolvedIsParsed() {
+        dataParser.parse(
+                "Patient ID: 1, Timestamp: 1000, Label: Alert, Data: resolved",
+                storage, "TXT");
+        List<PatientRecord> records = storage.getRecords(1, 0L, 9999L);
+        assertEquals(1, records.size());
+        assertEquals(0.0, records.get(0).getMeasurementValue(), 0.001);
+    }
+
+    @Test
+    void testWSSaturationWithPercentIsParsed() {
+        dataParser.parse("1,97%,Saturation,1000", storage, "WS");
+        List<PatientRecord> records = storage.getRecords(1, 0L, 9999L);
+        assertEquals(1, records.size());
+        assertEquals(97.0, records.get(0).getMeasurementValue(), 0.001);
+    }
+
+    @Test
+    void testWSAlertTriggeredIsParsed() {
+        dataParser.parse("1,triggered,Alert,1000", storage, "WS");
+        List<PatientRecord> records = storage.getRecords(1, 0L, 9999L);
+        assertEquals(1, records.size());
+        assertEquals(1.0, records.get(0).getMeasurementValue(), 0.001);
+    }
+
+    @Test
+    void testWSAlertResolvedIsParsed() {
+        dataParser.parse("1,resolved,Alert,1000", storage, "WS");
+        List<PatientRecord> records = storage.getRecords(1, 0L, 9999L);
+        assertEquals(1, records.size());
+        assertEquals(0.0, records.get(0).getMeasurementValue(), 0.001);
+    }
 }

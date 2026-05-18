@@ -3,10 +3,13 @@ package com.data_management;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import com.alerts.AlertGenerator;
 import com.data_management.dataReaders.DataReader;
+import com.data_management.dataReaders.FileDataReader;
 import com.data_management.dataReaders.MockReader;
+import com.data_management.dataReaders.WebSocketDataReader;
 import com.data_management.patients.Patient;
 import com.data_management.patients.PatientRecord;
 
@@ -116,18 +119,66 @@ public class DataStorage {
 
     /**
      * The main method for the DataStorage class.
-     * Initializes the system, reads data into storage, and continuously monitors
-     * and evaluates patient data.
+     * Initializes the system by reading patient data from the specified output
+     * directory, then continuously monitors and evaluates patient data to check
+     * for alert conditions.
      *
-     * @param args command line arguments
+     * <p>The output directory must be passed as the first command-line argument.
+     * Each {@code .txt} file in that directory is read by {@link FileDataReader}
+     * and parsed into {@link PatientRecord} objects stored in this instance.
+     * If no directory is provided, the user is prompted to enter one via the
+     * console.</p>
+     *
+     * <p>Optionally, a WebSocket connection can be established by passing a host
+     * and port as the second and third arguments. The WebSocket connection is
+     * non-blocking and receives data asynchronously in the background while the
+     * rest of the system continues.</p>
+     *
+     * <p>Usage:</p>
+     * <ul>
+     *   <li>File only: {@code DataStorage <output-directory>}</li>
+     *   <li>File + WebSocket: {@code DataStorage <output-directory> <host> <port>}</li>
+     * </ul>
+     *
+     * @param args command-line arguments; {@code args[0]} is the path to the
+     *             directory containing the simulator's output files,
+     *             {@code args[1]} is the optional WebSocket host, and
+     *             {@code args[2]} is the optional WebSocket port
      */
     public static void main(String[] args) {
-        DataReader reader = new MockReader("path/to/data");
-        DataStorage storage = new DataStorage(reader);
+        String outputDir;
+        if (args.length < 1) {
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("No output directory provided. Please enter the path: ");
+            outputDir = scanner.nextLine().trim();
+        } else {
+            outputDir = args[0];
+        }
 
-        // Assuming the reader has been properly initialized and can read data into the
-        // storage
-        // reader.readData(storage);
+        DataReader reader = new FileDataReader(outputDir);
+        DataStorage storage = DataStorage.getInstance(reader);
+
+        try {
+            reader.readData(storage);
+        } catch (Exception e) {
+            System.err.println("Failed to read file data: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        // Optionally connect to a WebSocket server if host and port are provided
+        // Usage: DataStorage <output-directory> <host> <port>
+        if (args.length == 3) {
+            String host = args[1];
+            int port = Integer.parseInt(args[2]);
+            WebSocketDataReader wsReader = new WebSocketDataReader(host, port);
+            try {
+                wsReader.readData(storage);
+                System.out.println("WebSocket connection established to " + host + ":" + port);
+            } catch (Exception e) {
+                System.err.println("Failed to connect to WebSocket: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
 
         // Example of using DataStorage to retrieve and print records for a patient
         List<PatientRecord> records = storage.getRecords(1, 1700000000000L, 1800000000000L);
