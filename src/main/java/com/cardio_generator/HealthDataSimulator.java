@@ -35,10 +35,11 @@ public class HealthDataSimulator {
 
     private static HealthDataSimulator instance;
 
-    private static int patientCount = 50; // Default number of patients
-    private static ScheduledExecutorService scheduler;
-    private static OutputStrategy outputStrategy = new ConsoleOutputStrategy(); // Default output strategy
-    private static final Random random = new Random();
+    // Changed fields from static to instance variables to align with the Singleton pattern
+    private int patientCount = 50; // Default number of patients
+    private ScheduledExecutorService scheduler;
+    private OutputStrategy outputStrategy = new ConsoleOutputStrategy(); // Default output strategy
+    private final Random random = new Random();
 
     private HealthDataSimulator() {}
 
@@ -65,6 +66,16 @@ public class HealthDataSimulator {
      */
     public static void main(String[] args) throws IOException {
 
+        HealthDataSimulator simulator = HealthDataSimulator.getInstance();
+        simulator.runSimulation(args);
+    }
+
+    /**
+     * Orchestrates the execution flow of the simulation utilizing instance fields.
+     *  @param args command-line arguments used to configure patient count and output strategy
+     * @throws IOException if there is an error setting up file-based output directories
+     */
+    private void runSimulation(String[] args) throws IOException {
         parseArguments(args);
 
         scheduler = Executors.newScheduledThreadPool(patientCount * 4);
@@ -83,7 +94,7 @@ public class HealthDataSimulator {
      * @param args the array of command-line arguments
      * @throws IOException if directory creation fails for the {@code file} output strategy
      */
-    private static void parseArguments(String[] args) throws IOException {
+    private void parseArguments(String[] args) throws IOException {
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
                 case "-h":
@@ -147,7 +158,7 @@ public class HealthDataSimulator {
     /**
      * Prints usage instructions and available options to the console.
      */
-    private static void printHelp() {
+    private void printHelp() {
         System.out.println("Usage: java HealthDataSimulator [options]");
         System.out.println("Options:");
         System.out.println("  -h                       Show help and exit.");
@@ -170,7 +181,7 @@ public class HealthDataSimulator {
      * @param patientCount the number of patients to initialize IDs for
      * @return a list of sequential patient IDs
      */
-    private static List<Integer> initializePatientIds(int patientCount) {
+    private List<Integer> initializePatientIds(int patientCount) {
         List<Integer> patientIds = new ArrayList<>();
         for (int i = 1; i <= patientCount; i++) {
             patientIds.add(i);
@@ -184,7 +195,7 @@ public class HealthDataSimulator {
      *
      * @param patientIds the list of patient IDs for whom data should be generated
      */
-    private static void scheduleTasksForPatients(List<Integer> patientIds) {
+    private void scheduleTasksForPatients(List<Integer> patientIds) {
         ECGDataGenerator ecgDataGenerator = new ECGDataGenerator(patientCount);
         BloodSaturationDataGenerator bloodSaturationDataGenerator = new BloodSaturationDataGenerator(patientCount);
         BloodPressureDataGenerator bloodPressureDataGenerator = new BloodPressureDataGenerator(patientCount);
@@ -207,7 +218,7 @@ public class HealthDataSimulator {
      * @param period   the time between successive executions
      * @param timeUnit the time unit of the period and initial delay
      */
-    private static void scheduleTask(Runnable task, long period, TimeUnit timeUnit) {
+    private void scheduleTask(Runnable task, long period, TimeUnit timeUnit) {
         scheduler.scheduleAtFixedRate(task, random.nextInt(5), period, timeUnit);
     }
 }

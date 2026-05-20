@@ -1,6 +1,10 @@
 package com.alerts;
 
 import com.alerts.alerts.Alert;
+import com.alerts.strategies.AlertStrategy;
+import com.alerts.strategies.BloodPressureStrategy;
+import com.alerts.strategies.HeartRateStrategy;
+import com.alerts.strategies.OxygenSaturationStrategy;
 import com.data_management.DataStorage;
 import com.data_management.patients.Patient;
 import com.data_management.patients.PatientRecord;
@@ -19,6 +23,16 @@ import java.util.List;
 public class AlertGenerator {
     private DataStorage dataStorage;
     private AlertManager alertManager;
+
+    /** Strategy that checks systolic and diastolic blood pressure thresholds and trends. */
+    private final AlertStrategy bloodPressureStrategy = new BloodPressureStrategy();
+
+    /** Strategy that detects abnormal ECG / heart-rate spikes. */
+    private final AlertStrategy heartRateStrategy = new HeartRateStrategy();
+
+    /** Strategy that checks blood oxygen saturation levels and rapid drops. */
+    private final AlertStrategy oxygenSaturationStrategy = new OxygenSaturationStrategy();
+
     // Change: seperated the code into multiple lines for better readability
     //Change: Javadoc cleanup
     /**
@@ -52,7 +66,7 @@ public class AlertGenerator {
         List<PatientRecord> records = patient.getAllRecords();
 
         List<PatientRecord> systolicPressure = new ArrayList<>();
-        List<PatientRecord> diastolicPressure = new ArrayList<>();
+        List<PatientRecord> bloodPressureRecords = new ArrayList<>();
         List<PatientRecord> bloodSaturation = new ArrayList<>();
         List<PatientRecord> ECG = new ArrayList<>();
         List<PatientRecord> triggeredAlert = new ArrayList<>();
@@ -61,8 +75,9 @@ public class AlertGenerator {
         for(PatientRecord patientRecord : records) {
             if (patientRecord.getRecordType().equals("SystolicPressure")) {
                 systolicPressure.add(patientRecord);
+                bloodPressureRecords.add(patientRecord);
             } else if (patientRecord.getRecordType().equals("DiastolicPressure")) {
-                diastolicPressure.add(patientRecord);
+                bloodPressureRecords.add(patientRecord);
             } else if (patientRecord.getRecordType().equals("Saturation")) {
                 bloodSaturation.add(patientRecord);
             } else if (patientRecord.getRecordType().equals("ECG")) {
@@ -72,139 +87,13 @@ public class AlertGenerator {
             }
         }
 
-        checkSystolicBloodPressure(patient,systolicPressure);
-        checkBloodPressureTrends(patient, systolicPressure);
 
-        checkDiastolicBloodPressure(patient,diastolicPressure);
-        checkBloodPressureTrends(patient, diastolicPressure);
-
-        checkBloodSaturation(patient, bloodSaturation);
+        bloodPressureStrategy.checkAlert(patient, bloodPressureRecords, alertManager);
+        oxygenSaturationStrategy.checkAlert(patient, bloodSaturation, alertManager);
+        heartRateStrategy.checkAlert(patient, ECG, alertManager);
 
         checkHypotensiveHypoxemia(patient, systolicPressure, bloodSaturation);
-
-        checkECG(patient, ECG);
-
         checkTriggeredAlerts(patient, triggeredAlert);
-    }
-
-    // TODO not mock staf but staf that is assigned to the patient in all of the checks
-
-    /**
-     * Checks systolic blood pressure readings and triggers an alert if any value
-     * exceeds 180 mmHg or falls below 90 mmHg.
-     *
-     * @param patient the patient being evaluated
-     * @param records the list of systolic pressure records to check
-     */
-    private void checkSystolicBloodPressure(Patient patient,List<PatientRecord> records) {
-        if (records==null || records.isEmpty())
-            return;
-
-        for (PatientRecord patientRecord : records) {
-            if(patientRecord.getMeasurementValue() > 180 ) {
-                Alert alert = new Alert(String.valueOf(patientRecord.getPatientId()), "Systolic pressure exceeds 180 mmHg" , patientRecord.getTimestamp());
-                Staff mockstaff = new Staff(0);
-                triggerAlert(alert, List.of(mockstaff));
-            }
-            else if(patientRecord.getMeasurementValue() < 90) {
-                Alert alert = new Alert(String.valueOf(patientRecord.getPatientId()), "Systolic pressure is bellow 90 mmHg", patientRecord.getTimestamp());
-                Staff mockstaff = new Staff(0);
-                triggerAlert(alert, List.of(mockstaff));
-            }
-        }
-    }
-
-    /**
-     * Checks diastolic blood pressure readings and triggers an alert if any value
-     * exceeds 120 mmHg or falls below 60 mmHg.
-     *
-     * @param patient the patient being evaluated
-     * @param records the list of diastolic pressure records to check
-     */
-    private void checkDiastolicBloodPressure(Patient patient,List<PatientRecord> records) {
-        if (records==null || records.isEmpty())
-            return;
-
-        for (PatientRecord patientRecord : records) {
-            if(patientRecord.getMeasurementValue() > 120 ) {
-                Alert alert = new Alert(String.valueOf(patientRecord.getPatientId()), "Diastolic pressure exceeds 120 mmHg" , patientRecord.getTimestamp());
-                Staff mockstaff = new Staff(0);
-                triggerAlert(alert, List.of(mockstaff));
-            }
-            else if(patientRecord.getMeasurementValue() < 60) {
-                Alert alert = new Alert(String.valueOf(patientRecord.getPatientId()), "Diastolic  pressure is bellow 60 mmHg" , patientRecord.getTimestamp());
-                Staff mockstaff = new Staff(0);
-                triggerAlert(alert, List.of(mockstaff));
-            }
-        }
-    }
-
-    /**
-     * Checks blood pressure trends, an alert is triggered if three consecutive readings each
-     * differ by more than 10 mmHg in the same direction.
-     *
-     * @param patient the patient being evaluated
-     * @param records the list of blood pressure records (systolic or diastolic) to check
-     */
-    private void checkBloodPressureTrends(Patient patient,List<PatientRecord> records){
-        if (records.size()<3)
-            return;
-
-        records= sortPatientRecord(records);
-
-        for (int i = 0; i < records.size() - 2; i++) {
-            double first = records.get(i).getMeasurementValue();
-            double second = records.get(i+1).getMeasurementValue();
-            double third = records.get(i+2).getMeasurementValue();
-
-            if(second-first > 10 && third-second > 10) {
-                Alert alert = new Alert(String.valueOf(records.get(i).getPatientId()),
-                        "Increasing blood pressure" , records.get(i).getTimestamp());
-                Staff mockstaff = new Staff(0);
-                triggerAlert(alert, List.of(mockstaff));
-            }
-            else if(first - second > 10 && second - third > 10) {
-                Alert alert = new Alert(String.valueOf(records.get(i).getPatientId()),
-                        "Decreasing blood pressure" , records.get(i).getTimestamp());
-                Staff mockstaff = new Staff(0);
-                triggerAlert(alert, List.of(mockstaff));
-            }
-        }
-    }
-
-    /**
-     * Checks diastolic blood saturation readings and triggers an alert if any value
-     * is below 92% or there is drop of 5% or more within a 10-minute window.
-     *
-     * @param patient the patient being evaluated
-     * @param records the list of blood saturation records to check
-     */
-    private void checkBloodSaturation(Patient patient,List<PatientRecord> records){
-        if (records==null || records.isEmpty())
-            return;
-
-        records=sortPatientRecord(records);
-
-        for (int i =0; i<records.size(); i++) {
-            if(records.get(i).getMeasurementValue() < 92 ) {
-                Alert alert = new Alert(String.valueOf(records.get(i).getPatientId()),
-                        "Blood oxygen saturation bellow 92%" , records.get(i).getTimestamp());
-                Staff mockstaff = new Staff(0);
-                triggerAlert(alert, List.of(mockstaff));
-            }
-
-            for (int j = i - 1; j >= 0; j--) {
-                long timeDiff = records.get(i).getTimestamp() - records.get(j).getTimestamp();
-                if (timeDiff > 600_000) break;
-                if (records.get(j).getMeasurementValue() - records.get(i).getMeasurementValue() >= 5) {
-                    Alert alert = new Alert(String.valueOf(records.get(i).getPatientId()),
-                            "Rapid drop of blood oxygen saturation" , records.get(i).getTimestamp());
-                    Staff mockstaff = new Staff(0);
-                    triggerAlert(alert, List.of(mockstaff));
-                    break;
-                }
-            }
-        }
     }
 
     /**
@@ -253,37 +142,6 @@ public class AlertGenerator {
     }
 
     /**
-     * Analyzes ECG readings using a sliding window of 10 samples. An alert is triggered
-     * if the current reading exceeds 150% of the rolling average, indicating an abnormal spike.
-     *
-     * @param patient the patient being evaluated
-     * @param records the list of ECG records to check
-     */
-    private void checkECG(Patient patient,List<PatientRecord> records){
-        if (records==null || records.isEmpty())
-            return;
-
-        records= sortPatientRecord(records);
-
-        int windowSize = 10;
-        for (int i = windowSize; i < records.size(); i++) {
-            double avg = 0;
-            for (int j = i - windowSize; j < i; j++)
-                avg += records.get(j).getMeasurementValue();
-
-            avg /= windowSize;
-            double current = records.get(i).getMeasurementValue();
-            // Triggering an alert if current is 50% higher the average, which can be considered significant amount
-            if (current > avg*1.5) {
-                Alert alert = new Alert(String.valueOf(records.get(i).getPatientId()),
-                        "ECG abnormal data" , records.get(i).getTimestamp());
-                Staff mockstaff = new Staff(0);
-                triggerAlert(alert, List.of(mockstaff));
-            }
-        }
-    }
-
-    /**
      * Checks for manually triggered alerts in the patient's records. An alert is
      * dispatched if a record of type {@code "Alert"} has a measurement value of {@code 1}.
      *
@@ -314,20 +172,12 @@ public class AlertGenerator {
      * @return the sorted list, or {@code null} if the input is null or empty
      */
     private List<PatientRecord> sortPatientRecord(List<PatientRecord> records) {
-        if (records==null || records.isEmpty())
-            return null;
-
-        for (int i = 0; i < records.size() - 1; i++) {
-            for (int j = 0; j < records.size() - 1 - i; j++) {
-                if (records.get(j).getTimestamp() > records.get(j + 1).getTimestamp()) {
-                    PatientRecord temp = records.get(j);
-                    records.set(j, records.get(j + 1));
-                    records.set(j + 1, temp);
-                }
-            }
+        if (records == null || records.isEmpty()) {
+            return new ArrayList<>();
         }
-
-        return records;
+        List<PatientRecord> sorted = new ArrayList<>(records);
+        sorted.sort((a, b) -> Long.compare(a.getTimestamp(), b.getTimestamp()));
+        return sorted;
     }
 
     //Change: Javadoc cleanup
